@@ -22,9 +22,9 @@ object SlidingEvents {
         extended.sliding(2)
       }
     }
-    if (args.useStartEnd)
+    if (args.useStartEnd) {
       slidingWithStartEnd
-    else{
+    } else{
       sliding
     }
   }

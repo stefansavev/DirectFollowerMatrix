@@ -1,14 +1,14 @@
 package io
 import java.io.{ BufferedReader, FileReader, Reader }
 
-import org.apache.commons.csv.{ CSVFormat, CSVParser, CSVRecord }
+import org.apache.commons.csv.{ CSVFormat, CSVRecord }
 
 import collection.JavaConverters._
 
 case class CSVOptions(header: Seq[String])
 
 trait Closer {
-  def close()
+  def close(): Unit
 }
 
 class CloserRegistry{

@@ -1,5 +1,5 @@
 package mining
-import mining.stages.{CSVFileArgs, GraphVizFormattingArgs, NoTraceFilter, NoTraceFilter$, OutputFormattingArgs, SlidingEventsArgs}
+import mining.stages.{CSVFileArgs, GraphVizFormattingArgs, NoTraceFilter, OutputFormattingArgs, SlidingEventsArgs}
 import org.scalatest.FunSpec
 import org.scalatest._
 import prop._
@@ -50,22 +50,22 @@ class DirectFollowerExtractionTest extends FunSpec {
     val args = TestUtils.defaultTestArgs(file, GraphVizFormattingArgs)
     val output = DirectFollowerExtraction.run(args)
     assert("\n" + output + "\n" == expectedOutput)
-    print(output)
   }
 
 }
 
 class TableTests extends PropSpec with TableDrivenPropertyChecks with Matchers {
 
-  val examples = Table("filename", "6Lines.csv")
+  val examples = Table("filename", "0Lines", "1Line", "3Lines", "3LinesNotOrdered", "6Lines")
 
   property("each file should work") {
     forAll(examples) { (t: String) =>
-      val file = getClass.getResource(s"/${t}").getPath()
+      val file = getClass.getResource(s"/${t}.csv").getPath()
       val args = TestUtils.defaultTestArgs(file, GraphVizFormattingArgs)
       val output = DirectFollowerExtraction.run(args)
-      println(t)
-      println(output)
+      val outputFile = getClass.getResource(s"/${t}Output.csv").getPath()
+      val expected = scala.io.Source.fromFile(outputFile).mkString
+      assert(output == expected)
     }
   }
 }

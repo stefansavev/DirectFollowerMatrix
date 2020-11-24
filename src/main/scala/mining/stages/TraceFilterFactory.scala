@@ -39,4 +39,3 @@ object TraceFilterFactory {
     args.apply
   }
 }
-

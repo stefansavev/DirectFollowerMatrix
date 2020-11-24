@@ -19,4 +19,3 @@ class IOKeyedCounter[K, V](defaultValue: V, reduce: (V, V) => V) extends IOKeyed
     store.toSeq
   }
 }
-

@@ -23,4 +23,3 @@ object CSVToRecordConverter {
     Event(traceId, activity, stringToZoneDateTime(startTime))
   }
 }
-

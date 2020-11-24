@@ -1,7 +1,9 @@
 package mining
 
 import io.{Closer, IOKeyedCounter}
-import mining.stages.{CSVFactory, CSVFileArgs, CSVFormattingArgs, CSVToRecordConverter, EventPartitioner, FormattingFactory, NoTraceFilter, OutputFormattingArgs, SlidingEvents, SlidingEventsArgs, SlidingWindowCounter, TraceFilterArgs, TraceFilterFactory}
+import mining.stages.{CSVFactory, CSVFileArgs, CSVFormattingArgs, CSVToRecordConverter, EventPartitioner}
+import mining.stages.{FormattingFactory, NoTraceFilter, OutputFormattingArgs, SlidingEvents, SlidingEventsArgs}
+import mining.stages.{SlidingWindowCounter, TraceFilterArgs, TraceFilterFactory}
 import models.Trace
 
 class CommandLineArgs(
@@ -53,5 +55,7 @@ object DirectFollowerExtraction extends App {
     }
   }
   val result = run(CommandLineArgs.fromArgs(args))
+  // scalastyle:off
   println(result)
+  // scalastyle:on
 }
