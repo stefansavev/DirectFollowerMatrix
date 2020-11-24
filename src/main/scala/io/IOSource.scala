@@ -1,7 +1,7 @@
 package io
-import java.io.{ BufferedReader, FileReader, Reader }
+import java.io.{BufferedReader, FileReader, Reader}
 
-import org.apache.commons.csv.{ CSVFormat, CSVRecord }
+import org.apache.commons.csv.{CSVFormat, CSVRecord}
 
 import collection.JavaConverters._
 
@@ -11,23 +11,18 @@ trait Closer {
   def close(): Unit
 }
 
-class CloserRegistry{
-  def add(c: Closer): Unit = {
+class CloserRegistry {
+  def add(c: Closer): Unit = {}
 
-  }
-
-  def closeAll(): Unit = {
-
-  }
+  def closeAll(): Unit = {}
 }
 
-object Closer{
+object Closer {
   def withCloser[T](f: CloserRegistry => T): T = {
     val reg = new CloserRegistry()
     try {
       f(reg)
-    }
-    finally {
+    } finally {
       reg.closeAll()
     }
   }

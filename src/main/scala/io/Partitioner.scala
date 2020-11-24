@@ -10,16 +10,18 @@ trait PartitionProps[INPUT, PART_KEY, SORT_KEY, VALUE] {
 
 case class Partition[PART_KEY, SORT_KEY, VALUE](
     key: PART_KEY,
-    values: Seq[(SORT_KEY, VALUE)])
+    values: Seq[(SORT_KEY, VALUE)]
+)
 
 case class PartitionOptions(tmpDir: Option[String])
 
 class Partitioner[INPUT, PART_KEY, SORT_KEY, VALUE](opts: PartitionOptions)(
-    implicit ord: Ordering[SORT_KEY]) {
+    implicit ord: Ordering[SORT_KEY]
+) {
   def partition(
       iter: Iterator[INPUT],
-      props: PartitionProps[INPUT, PART_KEY, SORT_KEY, VALUE])
-      : Iterator[Partition[PART_KEY, SORT_KEY, VALUE]] = {
+      props: PartitionProps[INPUT, PART_KEY, SORT_KEY, VALUE]
+  ): Iterator[Partition[PART_KEY, SORT_KEY, VALUE]] = {
 
     val grouped = iter.toSeq.groupBy(key => props.getPartitionKey(key))
     def prepareValues(values: Seq[INPUT]): Seq[(SORT_KEY, VALUE)] = {

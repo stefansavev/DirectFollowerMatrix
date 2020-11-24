@@ -5,27 +5,29 @@ import java.time.ZonedDateTime
 import mining.ZoneDateTimeOrdering
 import models.Trace
 
-trait TraceFilterArgs{
-  def apply(events: Iterator[Trace]):  Iterator[Trace]
+trait TraceFilterArgs {
+  def apply(events: Iterator[Trace]): Iterator[Trace]
 }
 
-object NoTraceFilter extends TraceFilterArgs{
-  def apply(events: Iterator[Trace]):  Iterator[Trace] = {
+object NoTraceFilter extends TraceFilterArgs {
+  def apply(events: Iterator[Trace]): Iterator[Trace] = {
     events
   }
 }
 
-case class TraceFilter(startedAtOrAfter: ZonedDateTime, endedAtOrAfter: ZonedDateTime){
+case class TraceFilter(
+    startedAtOrAfter: ZonedDateTime,
+    endedAtOrAfter: ZonedDateTime
+) {
   def apply(events: Iterator[Trace]): Iterator[Trace] = {
     def traceFilter(trace: Trace): Boolean = {
-      if (trace.events.length == 0){
+      if (trace.events.length == 0) {
         false
-      }
-      else{
+      } else {
         val first = trace.events(0)
         val last = trace.events.last
         ZoneDateTimeOrdering.compare(first.start, startedAtOrAfter) >= 0 &&
-          ZoneDateTimeOrdering.compare(last.start, endedAtOrAfter) <= 0
+        ZoneDateTimeOrdering.compare(last.start, endedAtOrAfter) <= 0
       }
     }
     events.filter(traceFilter)

@@ -12,10 +12,9 @@ object SlidingEvents {
       inp.sliding(2)
     }
     def slidingWithStartEnd(inp: Seq[Event]): Iterator[Seq[Event]] = {
-      if (inp.length == 0){
+      if (inp.length == 0) {
         Iterator.empty
-      }
-      else {
+      } else {
         val first = inp(0).copy(activity = "[Start]")
         val last = inp.last.copy(activity = "[End]")
         val extended = Seq.concat(Seq(first), inp, Seq(last))
@@ -24,7 +23,7 @@ object SlidingEvents {
     }
     if (args.useStartEnd) {
       slidingWithStartEnd
-    } else{
+    } else {
       sliding
     }
   }

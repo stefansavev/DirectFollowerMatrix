@@ -8,7 +8,10 @@ case class CSVFileArgs(fileName: String)
 
 object CSVFactory {
   type CSVProcessor = () => (Iterator[CSVRecord], Closer)
-  def fromArgs(args: CSVFileArgs): CSVProcessor = { (() =>
-    IOSource.fromCSVFile(args.fileName, CSVOptions(Header.getNames)))
+  def fromArgs(args: CSVFileArgs): CSVProcessor = {
+    (
+        () =>
+          IOSource.fromCSVFile(args.fileName, CSVOptions(Header.getNames))
+    )
   }
 }

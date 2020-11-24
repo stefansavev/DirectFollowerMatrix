@@ -2,17 +2,17 @@ package mining.stages
 
 import mining.Utils
 
-trait OutputFormattingArgs{
+trait OutputFormattingArgs {
   def apply(s: Seq[((String, String), Int)]): String
 }
 
-object CSVFormattingArgs extends OutputFormattingArgs{
+object CSVFormattingArgs extends OutputFormattingArgs {
   def apply(s: Seq[((String, String), Int)]): String = {
     Utils.formatFinalResults(s)
   }
 }
 
-object GraphVizFormattingArgs extends OutputFormattingArgs{
+object GraphVizFormattingArgs extends OutputFormattingArgs {
   def apply(s: Seq[((String, String), Int)]): String = {
     Utils.formatToDot(s)
   }

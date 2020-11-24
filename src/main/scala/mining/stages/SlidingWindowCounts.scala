@@ -6,7 +6,8 @@ import models.Trace
 object SlidingWindowCounter {
   def count(
       slidingProcessor: SlidingEvents.SlidingProcessor,
-      filteredEvents: Iterator[Trace]): Seq[((String, String), Int)] = {
+      filteredEvents: Iterator[Trace]
+  ): Seq[((String, String), Int)] = {
     val counter = new IOKeyedCounter[(String, String), Int](0, _ + _)
     filteredEvents.foreach(trace => {
       slidingProcessor(trace.events).foreach { conseqEvents =>

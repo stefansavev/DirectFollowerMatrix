@@ -23,14 +23,15 @@ object Utils {
     def quote(x: String): String = {
       val q = "\""
       q + x.replace(q, "\\").replace("\\", "\\\\") +
-      q
+        q
     }
     def nodeName(i: Int): String = {
       "node" + i.toString
     }
 
     sb.append(
-      "/* Visualize at: https://dreampuf.github.io/GraphvizOnline/ */\n")
+      "/* Visualize at: https://dreampuf.github.io/GraphvizOnline/ */\n"
+    )
     sb.append("digraph {\n")
     uniqueIdsWithIdx.foreach {
       case (name, idx) => {
@@ -40,8 +41,8 @@ object Utils {
     s.foreach {
       case ((k1, k2), _) => {
         sb.append(
-          s"  ${nodeName(id2Index(k1))} -> ${nodeName(id2Index(k2))} [label=${quote(
-            lookup(k1, k2).toString)}]\n")
+          s"  ${nodeName(id2Index(k1))} -> ${nodeName(id2Index(k2))} [label=${quote(lookup(k1, k2).toString)}]\n"
+        )
       }
     }
     sb.append("}")
