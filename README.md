@@ -23,8 +23,9 @@ Test: `sbt test`
 
 Build: `sbt package`
 
-# Usage:
+# Usage
 
 At present I only support usage via the tests.
+More work needs to be done to support the command line.
 
 

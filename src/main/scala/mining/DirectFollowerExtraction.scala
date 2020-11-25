@@ -62,7 +62,7 @@ object DirectFollowerExtraction extends App {
         WindowedEventsFactory.fromArgs(parsedArgs.slidingEventArgs)
       val formatter = OutputFactory.fromArgs(parsedArgs.formatArgs)
 
-      // Get an iterator and a closer. Closer if for cleaning up
+      // Get an iterator and a closer. Closer is for cleaning up
       val (csvRecordsIter, closer) = csvReader()
       cleanup.attach(closer) // I prefer as much linear control flow as possible
 
