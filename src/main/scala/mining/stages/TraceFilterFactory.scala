@@ -2,7 +2,7 @@ package mining.stages
 
 import java.time.ZonedDateTime
 
-import mining.ZoneDateTimeOrdering
+import mining.{ZoneDateTimeOrdering, ZoneDateTimeUtils}
 import models.Trace
 
 trait TraceFilterArgs {
@@ -15,10 +15,10 @@ object NoTraceFilter extends TraceFilterArgs {
   }
 }
 
-case class TraceFilter(
-    startedAtOrAfter: ZonedDateTime,
-    endedAtOrAfter: ZonedDateTime
-) {
+class InBetweenDatesTraceFilter(
+    val startedAtOrAfter: ZonedDateTime,
+    val endedAtOrAfter: ZonedDateTime
+) extends TraceFilterArgs {
   def apply(events: Iterator[Trace]): Iterator[Trace] = {
     def traceFilter(trace: Trace): Boolean = {
       if (trace.events.length == 0) {
@@ -31,6 +31,20 @@ case class TraceFilter(
       }
     }
     events.filter(traceFilter)
+  }
+}
+
+object InBetweenDatesTraceFilter {
+  def fromStrings(
+      format: String,
+      startedAtOrAfter: String,
+      endedAtOrAfter: String
+  ): TraceFilterArgs = {
+    val dateFormat = new java.text.SimpleDateFormat(format)
+    new InBetweenDatesTraceFilter(
+      ZoneDateTimeUtils.stringToZoneDateTime(dateFormat, startedAtOrAfter),
+      ZoneDateTimeUtils.stringToZoneDateTime(dateFormat, endedAtOrAfter)
+    )
   }
 }
 

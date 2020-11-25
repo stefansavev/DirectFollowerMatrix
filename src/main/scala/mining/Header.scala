@@ -7,6 +7,8 @@ object Header {
   val Complete = "Complete"
   val Classification = "Classification"
 
+  val defaultStartDateFormat = "yyyy/MM/dd HH:mm:ss.SSS"
+
   def getNames: Seq[String] = {
     Seq(CaseID, Activity, Start, Complete, Classification)
   }

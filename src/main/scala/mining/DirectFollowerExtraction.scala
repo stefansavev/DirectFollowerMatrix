@@ -31,7 +31,12 @@ object CommandLineArgs {
   def fromArgs(args: Array[String]): CommandLineArgs = {
     new CommandLineArgs(
       CSVFileArgs(args(1), Header.getNames),
-      RecordConverterArgs(Header.CaseID, Header.Activity, Header.Start),
+      RecordConverterArgs(
+        Header.CaseID,
+        Header.Activity,
+        Header.Start,
+        Header.defaultStartDateFormat
+      ),
       NoTraceFilter,
       SlidingEventsArgs(true),
       CSVFormattingArgs
@@ -61,19 +66,19 @@ object DirectFollowerExtraction extends App {
       val (csvRecordsIter, closer) = csvReader()
       cleanup.attach(closer) // I prefer as much linear control flow as possible
 
-      // build events out of CSV Records
+      // Build events out of CSV Records
       val eventsIter = csvRecordsIter.map(recordConverter)
 
-      // partition events into Traces. Potentially can work in external memory
-      val partitionedEvents = EventPartitioner.partition(eventsIter)
+      // Partition events into Traces. Potentially can work in external memory
+      val traces = EventPartitioner.partition(eventsIter)
 
-      // filter traces if necessary
-      val filteredEvents: Iterator[Trace] = traceFilter(partitionedEvents)
+      // Filter traces if necessary
+      val filteredTraces = traceFilter(traces)
 
-      // perform counting
-      val counts = SlidingWindowCounter.count(slidingProcessor, filteredEvents)
+      // Perform counting
+      val counts = SlidingWindowCounter.count(slidingProcessor, filteredTraces)
 
-      // prepare output
+      // Prepare output
       formatter(counts)
     }
   }
