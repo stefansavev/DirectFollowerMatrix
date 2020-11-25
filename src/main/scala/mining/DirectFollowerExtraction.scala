@@ -1,25 +1,27 @@
 package mining
 
-import io.{Closer, IOKeyedCounter}
+import io.Closer
 import mining.stages.{
-  CSVFactory,
   CSVFileArgs,
   CSVFormattingArgs,
-  CSVToRecordConverter,
-  EventPartitioner
-}
-import mining.stages.{
-  FormattingFactory,
+  EventPartitioner,
+  InputFactory,
   NoTraceFilter,
+  OutputFactory,
   OutputFormattingArgs,
-  SlidingEvents,
-  SlidingEventsArgs
+  RecordConverterArgs,
+  RecordConverterFactory,
+  SlidingEventsArgs,
+  SlidingWindowCounter,
+  TraceFilterArgs,
+  TraceFilterFactory,
+  WindowedEventsFactory
 }
-import mining.stages.{SlidingWindowCounter, TraceFilterArgs, TraceFilterFactory}
 import models.Trace
 
 class CommandLineArgs(
     val fileArgs: CSVFileArgs,
+    val recordConverterArgs: RecordConverterArgs,
     val filterArgs: TraceFilterArgs,
     val slidingEventArgs: SlidingEventsArgs,
     val formatArgs: OutputFormattingArgs
@@ -28,7 +30,8 @@ class CommandLineArgs(
 object CommandLineArgs {
   def fromArgs(args: Array[String]): CommandLineArgs = {
     new CommandLineArgs(
-      CSVFileArgs(args(1)),
+      CSVFileArgs(args(1), Header.getNames),
+      RecordConverterArgs(Header.CaseID, Header.Activity, Header.Start),
       NoTraceFilter,
       SlidingEventsArgs(true),
       CSVFormattingArgs
@@ -46,23 +49,26 @@ object DirectFollowerExtraction extends App {
   def run(parsedArgs: CommandLineArgs): String = {
     Closer.withCloser { cleanup =>
       // Create parameterized objects
-      val csvReader = CSVFactory.fromArgs(parsedArgs.fileArgs)
-      val eventsFilter = TraceFilterFactory.fromArgs(parsedArgs.filterArgs)
-      val slidingProcessor = SlidingEvents.fromArgs(parsedArgs.slidingEventArgs)
-      val formatter = FormattingFactory.fromArgs(parsedArgs.formatArgs)
+      val csvReader = InputFactory.fromArgs(parsedArgs.fileArgs)
+      val recordConverter =
+        RecordConverterFactory.fromArgs(parsedArgs.recordConverterArgs)
+      val traceFilter = TraceFilterFactory.fromArgs(parsedArgs.filterArgs)
+      val slidingProcessor =
+        WindowedEventsFactory.fromArgs(parsedArgs.slidingEventArgs)
+      val formatter = OutputFactory.fromArgs(parsedArgs.formatArgs)
 
       // Get an iterator and a closer. Closer if for cleaning up
       val (csvRecordsIter, closer) = csvReader()
-      cleanup.add(closer) // this is GoLang style
+      cleanup.attach(closer) // I prefer as much linear control flow as possible
 
       // build events out of CSV Records
-      val eventsIter = csvRecordsIter.map(CSVToRecordConverter.csvRecordToEvent)
+      val eventsIter = csvRecordsIter.map(recordConverter)
 
       // partition events into Traces. Potentially can work in external memory
       val partitionedEvents = EventPartitioner.partition(eventsIter)
 
       // filter traces if necessary
-      val filteredEvents: Iterator[Trace] = eventsFilter(partitionedEvents)
+      val filteredEvents: Iterator[Trace] = traceFilter(partitionedEvents)
 
       // perform counting
       val counts = SlidingWindowCounter.count(slidingProcessor, filteredEvents)

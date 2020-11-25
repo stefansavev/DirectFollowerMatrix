@@ -5,14 +5,14 @@ import org.apache.commons.csv.{CSVFormat, CSVRecord}
 
 import collection.JavaConverters._
 
-case class CSVOptions(header: Seq[String])
+case class CSVOptions(columnNames: Seq[String])
 
 trait Closer {
   def close(): Unit
 }
 
 class CloserRegistry {
-  def add(c: Closer): Unit = {}
+  def attach(c: Closer): Unit = {}
 
   def closeAll(): Unit = {}
 }
@@ -46,7 +46,7 @@ object IOSource {
     val in = new BufferedReader(new FileReader(fileName))
     val closer = new ReaderCloser(in)
     val parser = CSVFormat.DEFAULT
-      .withHeader(options.header: _*)
+      .withHeader(options.columnNames: _*)
       .withSkipHeaderRecord()
       .parse(in)
       .getRecords

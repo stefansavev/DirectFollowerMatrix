@@ -1,5 +1,13 @@
 package mining
-import mining.stages.{CSVFileArgs, GraphVizFormattingArgs, NoTraceFilter, OutputFormattingArgs, SlidingEventsArgs}
+import mining.stages.{
+  CSVFileArgs,
+  CSVFormattingArgs,
+  GraphVizFormattingArgs,
+  NoTraceFilter,
+  OutputFormattingArgs,
+  RecordConverterArgs,
+  SlidingEventsArgs
+}
 import org.scalatest.FunSpec
 import org.scalatest._
 import prop._
@@ -7,12 +15,15 @@ import prop._
 object TestUtils {
   def defaultTestArgs(
       fileName: String,
-      formattingArgs: OutputFormattingArgs): CommandLineArgs = {
+      formattingArgs: OutputFormattingArgs
+  ): CommandLineArgs = {
     new CommandLineArgs(
-      fileArgs = CSVFileArgs(fileName),
-      filterArgs = NoTraceFilter,
-      slidingEventArgs = SlidingEventsArgs(useStartEnd = true),
-      formatArgs = formattingArgs)
+      CSVFileArgs(fileName, Header.getNames),
+      RecordConverterArgs(Header.CaseID, Header.Activity, Header.Start),
+      NoTraceFilter,
+      SlidingEventsArgs(true),
+      formattingArgs
+    )
   }
 
 }
@@ -52,11 +63,27 @@ class DirectFollowerExtractionTest extends FunSpec {
     assert("\n" + output + "\n" == expectedOutput)
   }
 
+  it("test table output") {
+    val expectedOutput =
+      """
+        |[End],[Start],step1,step2,step3
+        |[End],0,0,0,0,0
+        |[Start],0,0,1,0,0
+        |step1,0,0,0,1,0
+        |step2,0,0,0,0,1
+        |step3,1,0,0,0,0
+        |""".stripMargin
+    val file = getClass.getResource("/3Lines.csv").getPath()
+    val args = TestUtils.defaultTestArgs(file, CSVFormattingArgs)
+    val output = DirectFollowerExtraction.run(args)
+    assert("\n" + output + "\n" == expectedOutput)
+  }
 }
 
 class TableTests extends PropSpec with TableDrivenPropertyChecks with Matchers {
 
-  val examples = Table("filename", "0Lines", "1Line", "3Lines", "3LinesNotOrdered", "6Lines")
+  val examples =
+    Table("filename", "0Lines", "1Line", "3Lines", "3LinesNotOrdered", "6Lines")
 
   property("each file should work") {
     forAll(examples) { (t: String) =>
